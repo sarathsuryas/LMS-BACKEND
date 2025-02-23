@@ -38,7 +38,7 @@ export class AuthController {
           throw new UnauthorizedException("You are admin please go to admin login")
       }
        if(result){
-       const data = await this.authservice.login(result.password,loginDto.password,result.email,result.username)
+       const data = await this.authservice.login(result.password,loginDto.password,result._id as string,result.role)
        console.log(data)
          res.status(HttpStatus.OK).json({token:data.accessToken})
 

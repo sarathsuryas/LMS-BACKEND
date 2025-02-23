@@ -32,10 +32,10 @@ async checkEmail(value:{email:string}) {
       );
     }
   }
-async login(password:string,confirmPasword:string,email:string,username:string) {
+async login(password:string,confirmPasword:string,userId:string,role:string) {
     try {
         if(password === confirmPasword) {
-         const payload = {email,username}
+         const payload = {userId,role}
          const accessToken = this._jwtService.sign(payload,{secret:this._configService.get('JWT_SECRET_KEY'),expiresIn:'10m'})
          return {accessToken}
         } else {

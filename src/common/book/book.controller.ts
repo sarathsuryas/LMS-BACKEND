@@ -7,7 +7,6 @@ import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { ICustomRequset } from '../interfaces/ICustomRequest';
 import { RoleGuard } from 'src/guards/role/role.guard';
 import { CreateBookDto } from './dto/createBook.dto';
-import { PaginationQueryDto } from './dto/paginationQuery.dto';
 import { EditBookDto } from './dto/editBook.dto';
 
 @Controller('/admin/book')
@@ -48,6 +47,7 @@ export class BookController {
      const offset = parseInt(req.query.size as string)
        
         const books = await this._bookService.getAllBooks({page:pagenum,limit:offset,adminId:req.decodedData.adminId});
+
         return res.status(HttpStatus.OK).json({
           message: 'Books retrieved successfully',
           data: books.data,
@@ -80,6 +80,7 @@ export class BookController {
             }
         }
       }
+
 
 
 }
