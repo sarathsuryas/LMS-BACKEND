@@ -71,5 +71,12 @@ export class BookService {
         console.error(error)
      }
   }
+  async bookBorrowings(adminId:string) {
+    try {
+    return this._bookRepository.bookBorrowings(adminId)
+    } catch (error) {
+        console.error(error)
+    }
+  }
 }
  

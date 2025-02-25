@@ -56,6 +56,7 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
     update: Record<string, any>
   ): Promise<T | null> {
     try {
+      
       return await this._model.findOneAndUpdate(filter, update)
 
     } catch (error) {

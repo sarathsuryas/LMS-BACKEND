@@ -14,7 +14,6 @@ export class RoleGuard implements CanActivate {
       return true; 
     }
     const { decodedData } = context.switchToHttp().getRequest();
-    console.log(decodedData)
     const hasRole = requiredRoles.some(role => decodedData.role?.includes(role));
     if (!hasRole) {
       throw new ForbiddenException('You do not have permission (roles)');

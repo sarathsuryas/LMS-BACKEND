@@ -186,13 +186,48 @@ async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ da
 
   async return(bookId:string) {
     try {
-        console.log(bookId)
         await this._bookModel.findOneAndUpdate({_id:new Types.ObjectId(bookId)},{status:true})
        await this._bookHistoryModel.findOneAndUpdate({bookId:new Types.ObjectId(bookId)},{status:false})
     } catch (error) {
         console.error(error) 
     }
   }
+async bookBorrowings(adminId:string) {
+  try {
+    return await this._bookHistoryModel.aggregate([
+        {$match:{adminId:new Types.ObjectId(adminId)}},
+        {$sort:{createdAt:-1}},
+        {$lookup:{
+            from:'users',
+            localField:'userId',
+            foreignField:'_id',
+             as:'userData'
+        }},
+        {$lookup:{
+            from:'books',
+            localField:'bookId',
+            foreignField:'_id',
+            as:"bookData"
+        }},
+        {$unwind:'$userData'},
+        {$unwind:'$bookData'},
+        {$project:{
+            status:1,
+           bookData:{
+            _id:1,
+            title:1
+           },
+           userData:{
+            username:1
+           }
+        }}
+    ])
+    
+  } catch (error) {
+    console.error(error) 
+  }
+}
+
 
 }
 

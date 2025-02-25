@@ -11,76 +11,91 @@ import { EditBookDto } from './dto/editBook.dto';
 
 @Controller('/admin/book')
 export class BookController {
-    constructor(private readonly _bookService:BookService) {}
-    @UseGuards(AuthGuard,RoleGuard)
+    constructor(private readonly _bookService: BookService) { }
+    @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Post('create')
-    async create(@Body() body:CreateBookDto , @Req() req:ICustomRequset,@Res() res:Response) {
+    async create(@Body() body: CreateBookDto, @Req() req: ICustomRequset, @Res() res: Response) {
         try {
-         const obj:CreateBookDto = {
-             title: body.title,
-             genre: body.genre,
-             pages: body.pages,
-             adminId: req.decodedData.adminId
-         }
-         const book = await this._bookService.create(obj)
-         res.status(HttpStatus.CREATED).json({message:"book added succussfully",status:201})
-         
+            const obj: CreateBookDto = {
+                title: body.title,
+                genre: body.genre,
+                pages: body.pages,
+                adminId: req.decodedData.adminId
+            }
+            const book = await this._bookService.create(obj)
+            res.status(HttpStatus.CREATED).json({ message: "book added succussfully", status: 201 })
+
         } catch (error) {
-            if(error instanceof ConflictException) {
+            if (error instanceof ConflictException) {
                 res.status(error.getStatus())
-                .json({status:error.getStatus(),message:error.message})
-            } else if(error instanceof InternalServerErrorException) {
+                    .json({ status: error.getStatus(), message: error.message })
+            } else if (error instanceof InternalServerErrorException) {
                 res.status(error.getStatus())
-                .json({status:error.getStatus(),message:error.message})
+                    .json({ status: error.getStatus(), message: error.message })
             }
         }
     }
-    @UseGuards(AuthGuard,RoleGuard)
+    @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Get('get-books')
     async getAllBooks(
-        @Req() req:ICustomRequset,
+        @Req() req: ICustomRequset,
         @Res() res: Response) {
-      try {
-     const pagenum = parseInt(req.query.page as string)
-     const offset = parseInt(req.query.size as string)
-       
-        const books = await this._bookService.getAllBooks({page:pagenum,limit:offset,adminId:req.decodedData.adminId});
+        try {
+            const pagenum = parseInt(req.query.page as string)
+            const offset = parseInt(req.query.size as string)
 
-        return res.status(HttpStatus.OK).json({
-          message: 'Books retrieved successfully',
-          data: books.data,
-          totalCount:books.meta.totalCount
-        });
-      } catch (error) {
-        console.error('Error retrieving books:', error);
-        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          message: 'An unexpected error occurred',
-        });
-      }
+            const books = await this._bookService.getAllBooks({ page: pagenum, limit: offset, adminId: req.decodedData.adminId });
+
+            return res.status(HttpStatus.OK).json({
+                message: 'Books retrieved successfully',
+                data: books.data,
+                totalCount: books.meta.totalCount
+            });
+        } catch (error) {
+            console.error('Error retrieving books:', error);
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                message: 'An unexpected error occurred',
+            });
+        }
     }
-    @UseGuards(AuthGuard,RoleGuard)
+    @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Put('edit')
     async updateBook(
         @Body() updateBookDto: EditBookDto,
-        @Res() res:Response
-      ) {
+        @Res() res: Response
+    ) {
         try {
-            const data =  await this._bookService.update(updateBookDto)
+            const data = await this._bookService.update(updateBookDto)
             console.log(data)
-            res.status(HttpStatus.OK).json({message:"update success",status:true})
+            res.status(HttpStatus.OK).json({ message: "update success", status: true })
 
         } catch (error) {
-            if(error instanceof BadRequestException) {
-               res.status(error.getStatus()).json({success:false,message:error.message})
+            if (error instanceof BadRequestException) {
+                res.status(error.getStatus()).json({ success: false, message: error.message })
             } else {
                 throw new InternalServerErrorException()
             }
         }
-      }
-
+    }
+    @UseGuards(AuthGuard, RoleGuard)
+    @Roles(Role.Admin)
+    @Get('transaction')
+    async BookTransaction(@Req() req: ICustomRequset, @Res() res: Response) {
+        try {
+            const { adminId } = req.decodedData
+            const data = await this._bookService.bookBorrowings(adminId)
+            res.status(HttpStatus.OK).json(data)
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                res.status(error.getStatus()).json({ success: false, message: error.message })
+            } else {
+                throw new InternalServerErrorException()
+            }
+        }
+    }
 
 
 }
