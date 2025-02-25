@@ -28,7 +28,8 @@ async findAllPaginated(query: PaginationQueryDto) {
       this._bookModel.find({adminId:new Types.ObjectId(query.adminId)})
         .skip(skip)
         .limit(limit)
-        .exec(),
+        .sort({ createdAt: -1 })
+         .exec(),
       this._bookModel.countDocuments().exec()
     ]);
     
