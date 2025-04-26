@@ -64,9 +64,9 @@ export class BookService {
     }
   }
 
-  async return(bookId:string) {
+  async return(bookId:string,historyId:string) {
      try {
-        await this._bookRepository.return(bookId)
+        await this._bookRepository.return(bookId,historyId)
      } catch (error) {
         console.error(error)
      }

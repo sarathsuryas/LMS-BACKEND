@@ -185,10 +185,10 @@ async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ da
     }
   }
 
-  async return(bookId:string) {
+  async return(bookId:string,historyId:string) {
     try {
         await this._bookModel.findOneAndUpdate({_id:new Types.ObjectId(bookId)},{status:true})
-       await this._bookHistoryModel.findOneAndUpdate({bookId:new Types.ObjectId(bookId)},{status:false})
+       await this._bookHistoryModel.findOneAndUpdate({_id:new Types.ObjectId(historyId)},{status:false})
     } catch (error) {
         console.error(error) 
     }

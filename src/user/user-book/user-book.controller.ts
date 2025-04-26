@@ -68,8 +68,8 @@ export class UserBookController {
     @Patch('return')
     async returnBook(@Req() req:ICustomRequset,@Res() res:Response) {
         try {
-             const {bookId} = req.body
-            const data = await  this._bookService.return(bookId)
+             const {bookId,historyId} = req.body
+            const data = await  this._bookService.return(bookId,historyId)
             res.status(HttpStatus.OK).json(data)
         } catch (error) {
             if(error instanceof BadRequestException) {
