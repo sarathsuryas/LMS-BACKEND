@@ -32,12 +32,23 @@ export class UserBookController {
     @Patch('book-transaction')
     async bookTransaction(@Req() req:ICustomRequset,@Res() res:Response) {
         try {
-             const {bookId,adminId} = req.body 
+             const {bookId,adminId,returnDate,currentDate} = req.body 
              const userId = req.decodedData.userId
+              const docs = await this._bookService.bookHistory(userId) 
+              let count = 0
+              for (const element of docs) {
+                if(element.status === true) {
+                     count++
+                }
+                console.log(count)
+              }
+              if(count >= 5) {
+                return res.status(403).json({message:'your borrowing limit exceeded'})
+              }
              const dto = {
-                bookId,adminId,userId
+                bookId,adminId,userId,returnDate,currentDate
              }
-            const data =  this._bookService.bookTransaction(dto)
+            const data = await this._bookService.bookTransaction(dto)
             res.status(HttpStatus.CREATED).json({message:"transaction done"})
         } catch (error) {
             if(error instanceof BadRequestException) {

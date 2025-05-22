@@ -7,9 +7,10 @@ import { PaginationQueryDto } from "./dto/paginationQuery.dto";
 import { title } from "process";
 import { IBook } from "../interfaces/IBook";
 import { BookHistoryDocument } from "../models/bookhistory.model";
+import { IBaseRepository } from "src/user/interface/IBaseRepository";
 
 @Injectable()
-export class BookRepository{
+export class BookRepository {
     public bookRepository: BaseRepository<BookDocument>;
     public bookHistoryRepository:BaseRepository<BookHistoryDocument>
     constructor(
@@ -43,51 +44,7 @@ async findAllPaginated(query: PaginationQueryDto) {
       }
     };
   }
-// async GetAllUserBooks(limit:number,page:number,filter:string):Promise<{data:IBook[],count:number}> {
-//     try {
-//         const matchStage = filter ? { $match: { title: { $regex: filter, $options: 'i' } } } : {};
-  
-//       // Aggregate pipeline
-//       const data = await this._bookModel.aggregate([
-//         matchStage, // Apply filtering
-//         {
-//           $lookup: {
-//             from: 'users', // The collection to join
-//             localField: 'adminId', // Field in the current collection
-//             foreignField: '_id', // Field in the 'users' collection
-//             as: 'adminData', // Name of the joined field
-//           },
-//         },
-//         { $unwind: '$adminData' }, // Flatten the adminData array
-//         {
-//           $project: {
-//             _id: 1,
-//             title: 1,
-//             genre: 1,
-//             pages: 1,
-//             status: 1,
-//             adminData: {
-//               _id: 1,
-//               username: 1,
-//             },
-//           },
-//         },
-//         { $skip: (page - 1) * limit }, // Pagination: Skip records
-//         { $limit: limit }, // Pagination: Limit the number of records
-//       ]);
-  
-//       // Total count for pagination metadata
-//       const count = await this._bookModel.countDocuments(filter ? { title: { $regex: filter, $options: 'i' } } : {});
-  
-       
-//          return {
-//             data,count
-//          }
-//         } catch (error) {
-//         console.error(error)
-//         throw new BadRequestException("data fetch failed")
-//      }
-// }
+
 async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ data: IBook[]; count: number }> {
     try {
      
@@ -138,12 +95,15 @@ async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ da
   }
   async bookTransaction(dto) {
     try {
-       await this._bookModel.findByIdAndUpdate(dto.bookId,{status:false}) 
-      return  await this._bookHistoryModel.create({
+      
+      await this._bookModel.findByIdAndUpdate(dto.bookId,{status:false}) 
+        await this._bookHistoryModel.create({
             adminId:new Types.ObjectId(dto.adminId),
             userId:new Types.ObjectId(dto.userId),
             bookId:new Types.ObjectId(dto.bookId),
-            status:true
+            status:true,
+            borrowDate:new Date(),
+            returnDate:new Date(dto.returnDate)
         })
     } catch (error) {
         console.error(error)
@@ -170,10 +130,12 @@ async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ da
         {$unwind:'$adminData'},
         {$unwind:'$bookData'},
         {$project:{
+           borrowDate:1,
+            returnDate:1,
             status:1,
            bookData:{
             _id:1,
-            title:1
+            title:1,
            },
            adminData:{
             username:1
@@ -214,6 +176,8 @@ async bookBorrowings(adminId:string) {
         {$unwind:'$bookData'},
         {$project:{
             status:1,
+            borrowDate:1,
+            returnDate:1,
            bookData:{
             _id:1,
             title:1

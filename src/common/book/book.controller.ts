@@ -23,6 +23,10 @@ export class BookController {
                 pages: body.pages,
                 adminId: req.decodedData.adminId
             }
+            const exist = await this._bookService.existBook(obj.title)
+            if(exist) {
+                return res.status(HttpStatus.OK).json({message:"book already exist" ,status:200})
+            }
             const book = await this._bookService.create(obj)
             res.status(HttpStatus.CREATED).json({ message: "book added succussfully", status: 201 })
 
@@ -86,6 +90,7 @@ export class BookController {
     async BookTransaction(@Req() req: ICustomRequset, @Res() res: Response) {
         try {
             const { adminId } = req.decodedData
+            console.log('///////////////')
             const data = await this._bookService.bookBorrowings(adminId)
             res.status(HttpStatus.OK).json(data)
         } catch (error) {

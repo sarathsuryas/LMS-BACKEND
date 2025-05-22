@@ -3,4 +3,5 @@ export type CreateBookDto = {
     genre:string;
     pages:number;
     adminId:string;
+    
 }

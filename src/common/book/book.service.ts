@@ -10,6 +10,15 @@ import { IBook } from '../interfaces/IBook';
 @Injectable()
 export class BookService {
     constructor(private  _bookRepository:BookRepository) {}
+
+async existBook(name:string) {
+  try {
+   return this._bookRepository.bookRepository.findOneByQuery({title:name})
+  } catch (error) {
+    console.error(error)
+  }
+}
+
  async create(dto:CreateBookDto) {
       try {
         const data = await this._bookRepository.bookRepository.create({title:dto.title,adminId:new Types.ObjectId(dto.adminId),genre:dto.genre,pages:dto.pages})

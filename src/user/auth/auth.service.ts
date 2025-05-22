@@ -5,6 +5,7 @@ import { IAuthRepository } from 'src/user/interface/IAuthRepository';
 import { LoginDto } from './dto/logint.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ constructor(
 
 async checkEmail(value:{email:string}) {
  try {
-   return await this._authRepository.findOneByQuery(value)
+   return await this._authRepository.findOneByQuery<User>(value)
  } catch (error) {
   console.error(error)  
  }

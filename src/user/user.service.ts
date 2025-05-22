@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { Types } from 'mongoose';
+import { IUserRepository } from './interface/IUserRepository';
 
 @Injectable()
 export class UserService {
-    constructor(private _userRepository:UserRepository) {}
+    constructor(
+      @Inject('IUserRepository') private _userRepository:IUserRepository ) {}
    async getUserData(userId:string) {
         try {
             return await this._userRepository.findOneWithProjection({_id:new Types.ObjectId(userId)},{email:1,role:1,username:1})

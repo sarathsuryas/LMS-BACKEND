@@ -14,5 +14,9 @@ adminId:Types.ObjectId;
 bookId:Types.ObjectId;
 @Prop({required:true})
 status:boolean;
+@Prop({required:true})
+borrowDate:Date
+@Prop({required:true})
+returnDate:Date
 }
 export const bookHistorySchema = SchemaFactory.createForClass(BookHistory);

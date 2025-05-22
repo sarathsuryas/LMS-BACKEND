@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } 
 import { IAdminAuthRepository } from '../interface/IAdminAuthRepository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/user/models/user.model';
 
 @Injectable()
 export class AdminAuthService {
@@ -12,10 +13,10 @@ export class AdminAuthService {
     ) {}
     async checkEmail(value:{email:string}) {
         try {
-          return await this._adminAuthRepository.findOneByQuery(value)
+          return await this._adminAuthRepository.findOneByQuery<User>(value)
         } catch (error) {
          console.error(error)  
-        }
+        } 
        }
 
     async login(adminId:string,password:string,confirmPasword:string,email:string,role:string) {
