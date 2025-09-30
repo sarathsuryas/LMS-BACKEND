@@ -10,6 +10,12 @@ import { bookHistorySchema } from 'src/common/models/bookhistory.model';
 @Module({
   imports:[MongooseModule.forFeature([{name:'Book',schema:bookSchema},{name:"BookHistory",schema:bookHistorySchema}])],
   controllers: [UserBookController],
-  providers: [BookService,BookRepository,JwtService]
+  providers: [ {
+      provide: 'IBookService', // token
+      useClass: BookService,
+    }, {
+      provide: 'BOOK_REPOSITORY',
+      useClass: BookRepository 
+    },JwtService]
 })
 export class UserBookModule {}

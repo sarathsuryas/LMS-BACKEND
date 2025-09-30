@@ -11,6 +11,12 @@ import { User, UserSchema } from 'src/user/models/user.model';
 @Module({
   imports:[AdminAuthModule,MongooseModule.forFeature([{name:User.name,schema:UserSchema}])],
   controllers: [AdminController],
-  providers: [AdminService,JwtService,AdminRepository]
+  providers: [{
+      provide: 'IAdminService', // token
+      useClass: AdminService,
+    },JwtService, {
+      provide: 'IAdminRepository', // token
+      useClass: AdminRepository,   // bind interface to concrete repo
+    }]
 })
 export class AdminModule {}

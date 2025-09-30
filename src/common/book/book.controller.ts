@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ConflictException, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, ConflictException, Controller, Get, HttpException, HttpStatus, Inject, InternalServerErrorException, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
 import e, { Request, Response } from 'express';
 import { BookService } from './book.service';
 import { Roles } from 'src/decorators/role.decorator';
@@ -8,10 +8,11 @@ import { ICustomRequset } from '../interfaces/ICustomRequest';
 import { RoleGuard } from 'src/guards/role/role.guard';
 import { CreateBookDto } from './dto/createBook.dto';
 import { EditBookDto } from './dto/editBook.dto';
+import { IBookService } from 'src/user/interface/IBookService';
 
 @Controller('/admin/book')
 export class BookController {
-    constructor(private readonly _bookService: BookService) { }
+  constructor(@Inject('IBookService') private readonly _bookService: IBookService) {}
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Post('create')

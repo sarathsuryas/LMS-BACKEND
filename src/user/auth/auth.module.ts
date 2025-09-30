@@ -11,10 +11,16 @@ import { config } from 'src/config/config';
   imports:[
     MongooseModule.forFeature([{name:'User',schema:UserSchema}])],
   controllers: [AuthController],
-  providers:[AuthService,JwtService,
+  providers:[
+     {
+      provide: 'IAuthService', // token
+      useClass: AuthService,   // concrete implementation
+    },
+    JwtService,
     {
     provide: 'IAuthRepository', // Token for the interface
     useClass: AuthRepository,
   }]
 })
 export class AuthModule {}
+ 

@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, InternalServerErrorException, Put, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Inject, InternalServerErrorException, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Roles } from 'src/decorators/role.decorator';
 import { AuthGuard } from 'src/guards/auth/auth.guard';
@@ -6,10 +6,11 @@ import { RoleGuard } from 'src/guards/role/role.guard';
 import { Role } from 'src/enums/role.enum';
 import { ICustomRequset } from 'src/common/interfaces/ICustomRequest';
 import { Response } from 'express';
+import { IUserService } from './interface/IUserService';
 
 @Controller('user')
 export class UserController {
-    constructor(private _userService:UserService) {}
+  constructor(@Inject('IUserService') private readonly _userService: IUserService) {}
      @UseGuards(AuthGuard,RoleGuard)
      @Roles(Role.User)
      @Get('user-data')

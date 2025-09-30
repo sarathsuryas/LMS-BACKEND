@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { BookRepository } from './book.repository';
 import { CreateBookDto } from './dto/createBook.dto';
 import { PaginationQueryDto } from './dto/paginationQuery.dto';
@@ -6,10 +6,11 @@ import { EditBookDto } from './dto/editBook.dto';
 import { title } from 'process';
 import { Types } from 'mongoose';
 import { IBook } from '../interfaces/IBook';
+import { IBookService } from 'src/user/interface/IBookService';
 
 @Injectable()
-export class BookService {
-    constructor(private  _bookRepository:BookRepository) {}
+export class BookService implements IBookService {
+    constructor(@Inject('BOOK_REPOSITORY') private readonly _bookRepository: BookRepository) {}
 
 async existBook(name:string) {
   try {

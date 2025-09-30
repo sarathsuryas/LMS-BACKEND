@@ -9,10 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports:[ MongooseModule.forFeature([{name:'User',schema:UserSchema}])],
-  providers: [AdminAuthService,
+  providers: [
     {
       provide: 'IAdminAuthRepository', // Token for the interface
       useClass: AdminAuthRepository,
+    },
+     {
+      provide: 'IAdminAuthService', // token
+      useClass: AdminAuthService,
     },
    ConfigService,
    JwtService

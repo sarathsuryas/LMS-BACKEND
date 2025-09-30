@@ -2,9 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { Types } from 'mongoose';
 import { IUserRepository } from './interface/IUserRepository';
+import { IUserService } from './interface/IUserService';
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService{
     constructor(
       @Inject('IUserRepository') private _userRepository:IUserRepository ) {}
    async getUserData(userId:string) {

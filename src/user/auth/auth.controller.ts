@@ -1,13 +1,14 @@
-import { Body, Controller, HttpException, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { CreateUserDto } from './dto/createUser.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/logint.dto';
 import { token } from 'morgan';
+import { IAuthService } from '../interface/IAuthService';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authservice:AuthService) {}
+    constructor(@Inject('IAuthService') private readonly authservice: IAuthService) {}
     @Post('create')
     async create(@Body() userDto: CreateUserDto,@Res() res:Response) {
       try {

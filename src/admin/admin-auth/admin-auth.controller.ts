@@ -1,14 +1,16 @@
-import { Controller, HttpException, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Controller, HttpException, HttpStatus, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { LoginDto } from 'src/user/auth/dto/logint.dto';
 import { AdminAuthService } from './admin-auth.service';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
+import { IAdminAuthService } from 'src/user/interface/IAdminAuth';
 
 @Controller('/admin/auth')
 export class AdminAuthController {
-    constructor(private _adminAuthService:AdminAuthService) {}
-
+ constructor(
+    @Inject('IAdminAuthService') private readonly _adminAuthService: IAdminAuthService,
+  ) {}
   
   @Post('login')
     async login(@Req() req:Request, @Res() res:Response) {
