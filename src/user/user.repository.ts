@@ -7,11 +7,11 @@ import { BaseRepository } from 'src/baserepository/base.repository';
 import { IUserRepository } from './interface/IUserRepository';
 
 @Injectable()
-export class UserRepository extends BaseRepository<User> implements IUserRepository{
+export class UserRepository extends BaseRepository<User> implements IUserRepository {
   constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {
     super(userModel)
   }
-async update(
+  async update(
     filter,
     update,
   ) {
@@ -24,5 +24,5 @@ async update(
       throw new BadRequestException("updation failed")
     }
   }
-  
+
 }

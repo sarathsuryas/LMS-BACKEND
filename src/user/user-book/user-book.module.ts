@@ -8,14 +8,14 @@ import { JwtService } from '@nestjs/jwt';
 import { bookHistorySchema } from 'src/common/models/bookhistory.model';
 
 @Module({
-  imports:[MongooseModule.forFeature([{name:'Book',schema:bookSchema},{name:"BookHistory",schema:bookHistorySchema}])],
+  imports: [MongooseModule.forFeature([{ name: 'Book', schema: bookSchema }, { name: "BookHistory", schema: bookHistorySchema }])],
   controllers: [UserBookController],
-  providers: [ {
-      provide: 'IBookService', // token
-      useClass: BookService,
-    }, {
-      provide: 'BOOK_REPOSITORY',
-      useClass: BookRepository 
-    },JwtService]
+  providers: [{
+    provide: 'IBookService', // token
+    useClass: BookService,
+  }, {
+    provide: 'BOOK_REPOSITORY',
+    useClass: BookRepository
+  }, JwtService]
 })
-export class UserBookModule {}
+export class UserBookModule { }

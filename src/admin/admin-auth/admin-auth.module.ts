@@ -8,19 +8,19 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports:[ MongooseModule.forFeature([{name:'User',schema:UserSchema}])],
+  imports: [MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])],
   providers: [
     {
       provide: 'IAdminAuthRepository', // Token for the interface
       useClass: AdminAuthRepository,
     },
-     {
+    {
       provide: 'IAdminAuthService', // token
       useClass: AdminAuthService,
     },
-   ConfigService,
-   JwtService
+    ConfigService,
+    JwtService
   ],
   controllers: [AdminAuthController]
 })
-export class AdminAuthModule {}
+export class AdminAuthModule { }

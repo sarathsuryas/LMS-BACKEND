@@ -6,11 +6,11 @@ import { BaseRepository } from 'src/baserepository/base.repository';
 import { User } from 'src/user/models/user.model';
 
 @Injectable()
-export class AdminRepository extends BaseRepository<User>{
+export class AdminRepository extends BaseRepository<User> {
   constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {
     super(userModel)
   }
-async update(
+  async update(
     filter,
     update,
   ) {
@@ -23,5 +23,5 @@ async update(
       throw new BadRequestException("updation failed")
     }
   }
-  
+
 }

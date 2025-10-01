@@ -11,29 +11,29 @@ import { IBaseRepository } from "src/user/interface/IBaseRepository";
 
 @Injectable()
 export class BookRepository {
-    public bookRepository: BaseRepository<BookDocument>;
-    public bookHistoryRepository:BaseRepository<BookHistoryDocument>
-    constructor(
-        @InjectModel('Book') private readonly _bookModel:Model<BookDocument>,
-        @InjectModel('BookHistory') private readonly _bookHistoryModel:Model<BookHistoryDocument>
-    ) {
-        this.bookHistoryRepository = new BaseRepository<BookHistoryDocument>(_bookHistoryModel)
-        this.bookRepository = new BaseRepository<BookDocument>(_bookModel)
-    }
+  public bookRepository: BaseRepository<BookDocument>;
+  public bookHistoryRepository: BaseRepository<BookHistoryDocument>
+  constructor(
+    @InjectModel('Book') private readonly _bookModel: Model<BookDocument>,
+    @InjectModel('BookHistory') private readonly _bookHistoryModel: Model<BookHistoryDocument>
+  ) {
+    this.bookHistoryRepository = new BaseRepository<BookHistoryDocument>(_bookHistoryModel)
+    this.bookRepository = new BaseRepository<BookDocument>(_bookModel)
+  }
 
-async findAllPaginated(query: PaginationQueryDto) {
+  async findAllPaginated(query: PaginationQueryDto) {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
     console.log(limit)
     const [data, totalCount] = await Promise.all([
-      this._bookModel.find({adminId:new Types.ObjectId(query.adminId)})
+      this._bookModel.find({ adminId: new Types.ObjectId(query.adminId) })
         .skip(skip)
         .limit(limit)
         .sort({ createdAt: -1 })
-         .exec(),
+        .exec(),
       this._bookModel.countDocuments().exec()
     ]);
-    
+
     return {
       data,
       meta: {
@@ -45,12 +45,12 @@ async findAllPaginated(query: PaginationQueryDto) {
     };
   }
 
-async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ data: IBook[]; count: number }> {
+  async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ data: IBook[]; count: number }> {
     try {
-     
-  
+
+
       const matchStage = filter ? { $match: { title: { $regex: filter, $options: 'i' } } } : null;
-  
+
       // Aggregate pipeline
       const pipeline = [
         ...(matchStage ? [matchStage] : []), // Add $match stage conditionally
@@ -76,17 +76,17 @@ async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ da
             },
           },
         },
-        { $skip: (page - 1) * limit  }, // Pagination: Skip records
+        { $skip: (page - 1) * limit }, // Pagination: Skip records
         { $limit: limit }, // Pagination: Limit the number of records
       ];
-  
+
       const data = await this._bookModel.aggregate(pipeline);
-  
+
       // Total count for pagination metadata
       const count = await this._bookModel.countDocuments(
         filter ? { title: { $regex: filter, $options: 'i' } } : {}
       );
-  
+
       return { data, count };
     } catch (error) {
       console.error("Error fetching books:", error.message);
@@ -95,103 +95,115 @@ async GetAllUserBooks(limit: number, page: number, filter: string): Promise<{ da
   }
   async bookTransaction(dto) {
     try {
-      
-      await this._bookModel.findByIdAndUpdate(dto.bookId,{status:false}) 
-        await this._bookHistoryModel.create({
-            adminId:new Types.ObjectId(dto.adminId),
-            userId:new Types.ObjectId(dto.userId),
-            bookId:new Types.ObjectId(dto.bookId),
-            status:true,
-            borrowDate:new Date(),
-            returnDate:new Date(dto.returnDate)
-        })
+
+      await this._bookModel.findByIdAndUpdate(dto.bookId, { status: false })
+      await this._bookHistoryModel.create({
+        adminId: new Types.ObjectId(dto.adminId),
+        userId: new Types.ObjectId(dto.userId),
+        bookId: new Types.ObjectId(dto.bookId),
+        status: true,
+        borrowDate: new Date(),
+        returnDate: new Date(dto.returnDate)
+      })
     } catch (error) {
-        console.error(error)
+      console.error(error)
     }
   }
 
-  async bookHistory(userId:string) {
+  async bookHistory(userId: string) {
     try {
-      return  await this._bookHistoryModel.aggregate([
-        {$match:{userId:new Types.ObjectId(userId)}},
-        {$sort:{createdAt:-1}},
-        {$lookup:{
-            from:'users',
-            localField:'adminId',
-            foreignField:'_id',
-             as:'adminData'
-        }},
-        {$lookup:{
-            from:'books',
-            localField:'bookId',
-            foreignField:'_id',
-            as:"bookData"
-        }},
-        {$unwind:'$adminData'},
-        {$unwind:'$bookData'},
-        {$project:{
-           borrowDate:1,
-            returnDate:1,
-            status:1,
-           bookData:{
-            _id:1,
-            title:1,
-           },
-           adminData:{
-            username:1
-           }
-        }}
+      return await this._bookHistoryModel.aggregate([
+        { $match: { userId: new Types.ObjectId(userId) } },
+        { $sort: { createdAt: -1 } },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'adminId',
+            foreignField: '_id',
+            as: 'adminData'
+          }
+        },
+        {
+          $lookup: {
+            from: 'books',
+            localField: 'bookId',
+            foreignField: '_id',
+            as: "bookData"
+          }
+        },
+        { $unwind: '$adminData' },
+        { $unwind: '$bookData' },
+        {
+          $project: {
+            borrowDate: 1,
+            returnDate: 1,
+            status: 1,
+            bookData: {
+              _id: 1,
+              title: 1,
+            },
+            adminData: {
+              username: 1
+            }
+          }
+        }
       ])
     } catch (error) {
-        console.error(error)
+      console.error(error)
     }
   }
 
-  async return(bookId:string,historyId:string) {
+  async return(bookId: string, historyId: string) {
     try {
-        await this._bookModel.findOneAndUpdate({_id:new Types.ObjectId(bookId)},{status:true})
-       await this._bookHistoryModel.findOneAndUpdate({_id:new Types.ObjectId(historyId)},{status:false})
+      await this._bookModel.findOneAndUpdate({ _id: new Types.ObjectId(bookId) }, { status: true })
+      await this._bookHistoryModel.findOneAndUpdate({ _id: new Types.ObjectId(historyId) }, { status: false })
     } catch (error) {
-        console.error(error) 
+      console.error(error)
     }
   }
-async bookBorrowings(adminId:string) {
-  try {
-    return await this._bookHistoryModel.aggregate([
-        {$match:{adminId:new Types.ObjectId(adminId)}},
-        {$sort:{createdAt:-1}},
-        {$lookup:{
-            from:'users',
-            localField:'userId',
-            foreignField:'_id',
-             as:'userData'
-        }},
-        {$lookup:{
-            from:'books',
-            localField:'bookId',
-            foreignField:'_id',
-            as:"bookData"
-        }},
-        {$unwind:'$userData'},
-        {$unwind:'$bookData'},
-        {$project:{
-            status:1,
-            borrowDate:1,
-            returnDate:1,
-           bookData:{
-            _id:1,
-            title:1
-           },
-           userData:{
-            username:1
-           }
-        }}
-    ])
-    
-  } catch (error) {
-    console.error(error) 
+  async bookBorrowings(adminId: string) {
+    try {
+      return await this._bookHistoryModel.aggregate([
+        { $match: { adminId: new Types.ObjectId(adminId) } },
+        { $sort: { createdAt: -1 } },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userData'
+          }
+        },
+        {
+          $lookup: {
+            from: 'books',
+            localField: 'bookId',
+            foreignField: '_id',
+            as: "bookData"
+          }
+        },
+        { $unwind: '$userData' },
+        { $unwind: '$bookData' },
+        {
+          $project: {
+            status: 1,
+            borrowDate: 1,
+            returnDate: 1,
+            bookData: {
+              _id: 1,
+              title: 1
+            },
+            userData: {
+              username: 1
+            }
+          }
+        }
+      ])
+
+    } catch (error) {
+      console.error(error)
+    }
   }
-}
 
 
 }

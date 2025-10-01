@@ -12,7 +12,7 @@ import { IBookService } from 'src/user/interface/IBookService';
 
 @Controller('/admin/book')
 export class BookController {
-  constructor(@Inject('IBookService') private readonly _bookService: IBookService) {}
+    constructor(@Inject('IBookService') private readonly _bookService: IBookService) { }
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Post('create')
@@ -25,8 +25,8 @@ export class BookController {
                 adminId: req.decodedData.adminId
             }
             const exist = await this._bookService.existBook(obj.title)
-            if(exist) {
-                return res.status(HttpStatus.OK).json({message:"book already exist" ,status:200})
+            if (exist) {
+                return res.status(HttpStatus.OK).json({ message: "book already exist", status: 200 })
             }
             const book = await this._bookService.create(obj)
             res.status(HttpStatus.CREATED).json({ message: "book added succussfully", status: 201 })

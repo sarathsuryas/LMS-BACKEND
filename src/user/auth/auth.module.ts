@@ -8,19 +8,18 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { config } from 'src/config/config';
 
 @Module({
-  imports:[
-    MongooseModule.forFeature([{name:'User',schema:UserSchema}])],
+  imports: [
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])],
   controllers: [AuthController],
-  providers:[
-     {
+  providers: [
+    {
       provide: 'IAuthService', // token
       useClass: AuthService,   // concrete implementation
     },
     JwtService,
     {
-    provide: 'IAuthRepository', // Token for the interface
-    useClass: AuthRepository,
-  }]
+      provide: 'IAuthRepository', // Token for the interface
+      useClass: AuthRepository,
+    }]
 })
-export class AuthModule {}
- 
+export class AuthModule { }

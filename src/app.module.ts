@@ -16,15 +16,15 @@ import { AdminModule } from './admin/admin.module';
 @Module({
   imports: [
     DatabaseModule,
-      ConfigModule.forRoot({
-        isGlobal: true,
-        load: [config]
-      }),
-      UserModule,
-      AdminModule,
-      BookModule
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config]
+    }),
+    UserModule,
+    AdminModule,
+    BookModule
   ],
   controllers: [],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

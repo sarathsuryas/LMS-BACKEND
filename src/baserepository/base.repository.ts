@@ -33,7 +33,7 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
   }
   async findOneByQuery<R>(query: FilterQuery<T>): Promise<R> {
     try {
-      return await this._model.findOne(query).collation({locale:'en',strength:2}).lean() as R;
+      return await this._model.findOne(query).collation({ locale: 'en', strength: 2 }).lean() as R;
     } catch (error) {
       console.error("Error fetching record by ID:", error);
       throw new Error("Could not fetch record by ID");
@@ -52,11 +52,11 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
   }
 
   async findOneAndUpdate(
-    filter: Record<string,any>,
+    filter: Record<string, any>,
     update: Record<string, any>
   ): Promise<T | null> {
     try {
-      
+
       return await this._model.findOneAndUpdate(filter, update)
 
     } catch (error) {
@@ -90,11 +90,11 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
       return await this._model.create(item);
     } catch (error) {
       console.error("Error creating record in repository:", { item, error });
-    if (error.code === 11000) {
-      throw new ConflictException('Book Already Exist');
-    }
-    throw new InternalServerErrorException('Failed to create record');
-  
+      if (error.code === 11000) {
+        throw new ConflictException('Book Already Exist');
+      }
+      throw new InternalServerErrorException('Failed to create record');
+
     }
   }
 
@@ -149,24 +149,24 @@ export class BaseRepository<T extends Document> implements IBaseRepository<T> {
   async findWithSort<R>(
     filter: Record<string, any> = {},
     sort: Record<string, 1 | -1> = {},
-    limit?: number, 
-    skip?: number, 
-    projection?: Record<string, 1 | 0> 
+    limit?: number,
+    skip?: number,
+    projection?: Record<string, 1 | 0>
   ): Promise<R[]> {
     try {
       const query = this._model.find(filter).sort(sort).lean();
-  
+
       if (limit) query.limit(limit);
       if (skip) query.skip(skip);
-  
+
       if (projection) query.select(projection);
-  
+
       return await query.exec() as R[];
     } catch (error) {
       console.error("Error fetching records with sorting:", error);
       throw new Error("Could not fetch records with sorting");
     }
   }
-  
+
 
 }

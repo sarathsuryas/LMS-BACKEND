@@ -9,22 +9,22 @@ import { User } from '../models/user.model';
 
 @Injectable()
 export class AuthService {
-constructor(
-  @Inject('IAuthRepository') private _authRepository:IAuthRepository,
-  private _jwtService:JwtService,
-  private _configService:ConfigService
-) {}
+  constructor(
+    @Inject('IAuthRepository') private _authRepository: IAuthRepository,
+    private _jwtService: JwtService,
+    private _configService: ConfigService
+  ) { }
 
-async checkEmail(value:{email:string}) {
- try {
-   return await this._authRepository.findOneByQuery<User>(value)
- } catch (error) {
-  console.error(error)  
- }
-}
+  async checkEmail(value: { email: string }) {
+    try {
+      return await this._authRepository.findOneByQuery<User>(value)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   async createUser(userDto: CreateUserDto) {
-    try { 
+    try {
       return await this._authRepository.create(userDto);
     } catch (error) {
       throw new HttpException(
@@ -33,18 +33,18 @@ async checkEmail(value:{email:string}) {
       );
     }
   }
-async login(password:string,confirmPasword:string,userId:string,role:string) {
+  async login(password: string, confirmPasword: string, userId: string, role: string) {
     try {
-        if(password === confirmPasword) {
-         const payload = {userId,role}
-         const accessToken = this._jwtService.sign(payload,{secret:this._configService.get('JWT_SECRET_KEY'),expiresIn:'10m'})
-         return {accessToken}
-        } else {
-          throw new UnauthorizedException();
-        }
+      if (password === confirmPasword) {
+        const payload = { userId, role }
+        const accessToken = this._jwtService.sign(payload, { secret: this._configService.get('JWT_SECRET_KEY'), expiresIn: '10m' })
+        return { accessToken }
+      } else {
+        throw new UnauthorizedException();
+      }
     } catch (error) {
       console.error(error)
-      if(error instanceof UnauthorizedException) {
+      if (error instanceof UnauthorizedException) {
         throw new UnauthorizedException('please check your password');
       } else {
         throw new HttpException(
@@ -52,6 +52,6 @@ async login(password:string,confirmPasword:string,userId:string,role:string) {
           HttpStatus.BAD_REQUEST,
         );
       }
-    }  
     }
- }
+  }
+}

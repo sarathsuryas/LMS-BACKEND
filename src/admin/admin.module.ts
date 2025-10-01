@@ -9,14 +9,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/user/models/user.model';
 
 @Module({
-  imports:[AdminAuthModule,MongooseModule.forFeature([{name:User.name,schema:UserSchema}])],
+  imports: [AdminAuthModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
   controllers: [AdminController],
   providers: [{
-      provide: 'IAdminService', // token
-      useClass: AdminService,
-    },JwtService, {
-      provide: 'IAdminRepository', // token
-      useClass: AdminRepository,   // bind interface to concrete repo
-    }]
+    provide: 'IAdminService', // token
+    useClass: AdminService,
+  }, JwtService, {
+    provide: 'IAdminRepository', // token
+    useClass: AdminRepository,   // bind interface to concrete repo
+  }]
 })
-export class AdminModule {}
+export class AdminModule { }

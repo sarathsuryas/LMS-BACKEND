@@ -10,27 +10,28 @@ import { IAdminService } from 'src/user/interface/IAdminService';
 
 @Controller('admin')
 export class AdminController {
- constructor(
-    @Inject('IAdminService') private readonly _adminService: IAdminService,
-  ) {}     @UseGuards(AuthGuard,RoleGuard)
-     @Roles(Role.Admin)
-     @Get('admin-data')
-     async userData(@Req() req:ICustomRequset,@Res() res:Response) {
-        try {
-           const data = await  this._adminService.getUserData(req.decodedData.adminId)
-           res.status(HttpStatus.OK).json(data)
-        } catch (error) {
-            throw new InternalServerErrorException()
-        }
-     }
-   @Put('edit') 
-   async editData(@Req() req:ICustomRequset,@Res() res:Response) {
-    try {
-        console.log(req.body)
-        const data = await  this._adminService.editUser(req.body)
-        res.status(HttpStatus.OK).json(data)
-     } catch (error) {
+   constructor(
+      @Inject('IAdminService') private readonly _adminService: IAdminService,
+   ) { }
+   @UseGuards(AuthGuard, RoleGuard)
+   @Roles(Role.Admin)
+   @Get('admin-data')
+   async userData(@Req() req: ICustomRequset, @Res() res: Response) {
+      try {
+         const data = await this._adminService.getUserData(req.decodedData.adminId)
+         res.status(HttpStatus.OK).json(data)
+      } catch (error) {
          throw new InternalServerErrorException()
-     }
-   } 
+      }
+   }
+   @Put('edit')
+   async editData(@Req() req: ICustomRequset, @Res() res: Response) {
+      try {
+         console.log(req.body)
+         const data = await this._adminService.editUser(req.body)
+         res.status(HttpStatus.OK).json(data)
+      } catch (error) {
+         throw new InternalServerErrorException()
+      }
+   }
 }

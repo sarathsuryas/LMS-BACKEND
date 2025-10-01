@@ -9,15 +9,15 @@ import { User, UserSchema } from './models/user.model';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-    imports:[AuthModule, UserBookModule,MongooseModule.forFeature([{name:User.name,schema:UserSchema}])],
-    controllers: [UserController],
-    providers: [{
-      provide: 'IUserService', // token
-      useClass: UserService,
-    },
-    JwtService,{
-      provide: 'IUserRepository', // Interface
-      useClass: UserRepository,   // Concrete Implementation
-    }]
+  imports: [AuthModule, UserBookModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
+  controllers: [UserController],
+  providers: [{
+    provide: 'IUserService', // token
+    useClass: UserService,
+  },
+    JwtService, {
+    provide: 'IUserRepository', // Interface
+    useClass: UserRepository,   // Concrete Implementation
+  }]
 })
-export class UserModule {}
+export class UserModule { }
