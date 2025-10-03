@@ -1,6 +1,5 @@
 import { BadRequestException, Body, ConflictException, Controller, Get, HttpException, HttpStatus, Inject, InternalServerErrorException, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
-import e, { Request, Response } from 'express';
-import { BookService } from './book.service';
+import { Response } from 'express';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { AuthGuard } from 'src/guards/auth/auth.guard';
@@ -12,7 +11,8 @@ import { IBookService } from 'src/user/interface/IBookService';
 
 @Controller('/admin/book')
 export class BookController {
-    constructor(@Inject('IBookService') private readonly _bookService: IBookService) { }
+    constructor(@Inject('IBookService') private readonly bookService: IBookService) { }
+
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Post('create')
@@ -23,35 +23,37 @@ export class BookController {
                 genre: body.genre,
                 pages: body.pages,
                 adminId: req.decodedData.adminId
-            }
-            const exist = await this._bookService.existBook(obj.title)
+            };
+            const exist = await this.bookService.existBook(obj.title);
             if (exist) {
-                return res.status(HttpStatus.OK).json({ message: "book already exist", status: 200 })
+                return res.status(HttpStatus.OK).json({ message: "book already exist", status: 200 });
             }
-            const book = await this._bookService.create(obj)
-            res.status(HttpStatus.CREATED).json({ message: "book added succussfully", status: 201 })
+            await this.bookService.create(obj);
+            res.status(HttpStatus.CREATED).json({ message: "book added successfully", status: 201 });
 
         } catch (error) {
             if (error instanceof ConflictException) {
                 res.status(error.getStatus())
-                    .json({ status: error.getStatus(), message: error.message })
+                    .json({ status: error.getStatus(), message: error.message });
             } else if (error instanceof InternalServerErrorException) {
                 res.status(error.getStatus())
-                    .json({ status: error.getStatus(), message: error.message })
+                    .json({ status: error.getStatus(), message: error.message });
             }
         }
     }
+
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Get('get-books')
     async getAllBooks(
         @Req() req: ICustomRequset,
-        @Res() res: Response) {
+        @Res() res: Response
+    ) {
         try {
-            const pagenum = parseInt(req.query.page as string)
-            const offset = parseInt(req.query.size as string)
+            const pageNum = parseInt(req.query.page as string);
+            const offset = parseInt(req.query.size as string);
 
-            const books = await this._bookService.getAllBooks({ page: pagenum, limit: offset, adminId: req.decodedData.adminId });
+            const books = await this.bookService.getAllBooks({ page: pageNum, limit: offset, adminId: req.decodedData.adminId });
 
             return res.status(HttpStatus.OK).json({
                 message: 'Books retrieved successfully',
@@ -65,6 +67,7 @@ export class BookController {
             });
         }
     }
+
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Put('edit')
@@ -73,35 +76,34 @@ export class BookController {
         @Res() res: Response
     ) {
         try {
-            const data = await this._bookService.update(updateBookDto)
-            console.log(data)
-            res.status(HttpStatus.OK).json({ message: "update success", status: true })
+            const data = await this.bookService.update(updateBookDto);
+            console.log(data);
+            res.status(HttpStatus.OK).json({ message: "update success", status: true });
 
         } catch (error) {
             if (error instanceof BadRequestException) {
-                res.status(error.getStatus()).json({ success: false, message: error.message })
+                res.status(error.getStatus()).json({ success: false, message: error.message });
             } else {
-                throw new InternalServerErrorException()
+                throw new InternalServerErrorException();
             }
         }
     }
+
     @UseGuards(AuthGuard, RoleGuard)
     @Roles(Role.Admin)
     @Get('transaction')
-    async BookTransaction(@Req() req: ICustomRequset, @Res() res: Response) {
+    async bookTransaction(@Req() req: ICustomRequset, @Res() res: Response) {
         try {
-            const { adminId } = req.decodedData
-            console.log('///////////////')
-            const data = await this._bookService.bookBorrowings(adminId)
-            res.status(HttpStatus.OK).json(data)
+            const { adminId } = req.decodedData;
+            console.log('///////////////');
+            const data = await this.bookService.bookBorrowings(adminId);
+            res.status(HttpStatus.OK).json(data);
         } catch (error) {
             if (error instanceof BadRequestException) {
-                res.status(error.getStatus()).json({ success: false, message: error.message })
+                res.status(error.getStatus()).json({ success: false, message: error.message });
             } else {
-                throw new InternalServerErrorException()
+                throw new InternalServerErrorException();
             }
         }
     }
-
-
 }

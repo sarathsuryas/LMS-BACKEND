@@ -1,13 +1,12 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { BaseRepository } from "src/baserepository/base.repository";
 import { BookDocument } from "../models/book.model";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model, Mongoose, Types } from "mongoose";
+import { Model, Types } from "mongoose";
 import { PaginationQueryDto } from "./dto/paginationQuery.dto";
-import { title } from "process";
 import { IBook } from "../interfaces/IBook";
 import { BookHistoryDocument } from "../models/bookhistory.model";
-import { IBaseRepository } from "src/user/interface/IBaseRepository";
+
 
 @Injectable()
 export class BookRepository {

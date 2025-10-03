@@ -7,29 +7,30 @@ import { User } from 'src/user/models/user.model';
 @Injectable()
 export class AdminAuthService {
   constructor(
-    @Inject('IAdminAuthRepository') private _adminAuthRepository: IAdminAuthRepository,
-    private _jwtService: JwtService,
-    private _configService: ConfigService
+    @Inject('IAdminAuthRepository') private adminAuthRepository: IAdminAuthRepository,
+    private jwtService: JwtService,
+    private configService: ConfigService
   ) { }
+
   async checkEmail(value: { email: string }) {
     try {
-      return await this._adminAuthRepository.findOneByQuery<User>(value)
+      return await this.adminAuthRepository.findOneByQuery<User>(value);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 
-  async login(adminId: string, password: string, confirmPasword: string, email: string, role: string) {
+  async login(adminId: string, password: string, confirmPassword: string, email: string, role: string) {
     try {
-      if (password === confirmPasword) {
-        const payload = { adminId, role }
-        const accessToken = this._jwtService.sign(payload, { secret: this._configService.get('JWT_SECRET_KEY'), expiresIn: '10m' })
-        return { accessToken }
+      if (password === confirmPassword) {
+        const payload = { adminId, role };
+        const accessToken = this.jwtService.sign(payload, { secret: this.configService.get('JWT_SECRET_KEY'), expiresIn: '10m' });
+        return { accessToken };
       } else {
         throw new UnauthorizedException();
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       if (error instanceof UnauthorizedException) {
         throw new UnauthorizedException('please check your password');
       } else {

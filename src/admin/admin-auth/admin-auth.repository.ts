@@ -5,7 +5,7 @@ import { User } from "src/user/models/user.model";
 import { IAdminAuthRepository } from "../interface/IAdminAuthRepository";
 
 export class AdminAuthRepository extends BaseRepository<User> implements IAdminAuthRepository {
-    constructor(@InjectModel('User') private readonly _userModel: Model<User>) {
-        super(_userModel)
+    constructor(@InjectModel('User') private readonly userModel: Model<User>) {
+        super(userModel);
     }
 }

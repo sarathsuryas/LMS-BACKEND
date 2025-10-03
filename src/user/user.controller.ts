@@ -9,27 +9,28 @@ import { IUserService } from './interface/IUserService';
 
 @Controller('user')
 export class UserController {
-   constructor(@Inject('IUserService') private readonly _userService: IUserService) { }
+   constructor(@Inject('IUserService') private readonly userService: IUserService) { }
+
    @UseGuards(AuthGuard, RoleGuard)
    @Roles(Role.User)
    @Get('user-data')
    async userData(@Req() req: ICustomRequset, @Res() res: Response) {
       try {
-         const data = await this._userService.getUserData(req.decodedData.userId)
-         res.status(HttpStatus.OK).json(data)
+         const data = await this.userService.getUserData(req.decodedData.userId);
+         res.status(HttpStatus.OK).json(data);
       } catch (error) {
-         throw new InternalServerErrorException()
-      }
-   }
-   @Put('edit')
-   async editData(@Req() req: ICustomRequset, @Res() res: Response) {
-      try {
-         console.log(req.body)
-         const data = await this._userService.editUser(req.body)
-         res.status(HttpStatus.OK).json(data)
-      } catch (error) {
-         throw new InternalServerErrorException()
+         throw new InternalServerErrorException();
       }
    }
 
+   @Put('edit')
+   async editData(@Req() req: ICustomRequset, @Res() res: Response) {
+      try {
+         console.log(req.body);
+         const data = await this.userService.editUser(req.body);
+         res.status(HttpStatus.OK).json(data);
+      } catch (error) {
+         throw new InternalServerErrorException();
+      }
+   }
 }
